@@ -60,11 +60,12 @@ prompt_tty() {
     local __secret="${3:-0}"
     local __value=""
     if [[ -e /dev/tty ]]; then
+        printf '%s' "$__prompt" >/dev/tty
         if [[ "$__secret" == "1" ]]; then
-            read -r -s -p "$__prompt" __value </dev/tty || true
+            read -r -s __value </dev/tty || true
             printf '\n' >/dev/tty
         else
-            read -r -p "$__prompt" __value </dev/tty || true
+            read -r __value </dev/tty || true
             printf '\n' >/dev/tty
         fi
     fi
@@ -72,26 +73,48 @@ prompt_tty() {
 }
 
 choose_provider() {
-    local choice=""
-    local provider="deepseek"
+    local -a providers=("deepseek" "kimi" "minimax" "qwen" "glm")
+    local -a labels=("deepseek (default)" "kimi" "minimax" "qwen" "glm")
+    local idx=0
+    local key rest
     if [[ -e /dev/tty ]]; then
-        echo -e "${CYAN}→ 先选模型，再配置 Key...${NC}"
-        echo "  1) deepseek (default)"
-        echo "  2) kimi"
-        echo "  3) minimax"
-        echo "  4) qwen"
-        echo "  5) glm"
-        read -r -p "  请选择 [1-5, Enter=1]: " choice </dev/tty || true
-        printf '\n' >/dev/tty
+        printf '%b\n' "${CYAN}→ 先选模型，再配置 Key...${NC}" >/dev/tty
+        while true; do
+            printf '\033[H\033[J' >/dev/tty
+            printf '%b\n' "${CYAN}→ 先选模型，再配置 Key...${NC}" >/dev/tty
+            printf '  Use ↑/↓ to move, Enter to confirm.\n' >/dev/tty
+            printf '\n' >/dev/tty
+            local i
+            for i in "${!labels[@]}"; do
+                if [[ $i -eq $idx ]]; then
+                    printf '  > \033[7m%1d) %s\033[0m\n' "$((i + 1))" "${labels[$i]}" >/dev/tty
+                else
+                    printf '    %1d) %s\n' "$((i + 1))" "${labels[$i]}" >/dev/tty
+                fi
+            done
+            printf '\n' >/dev/tty
+            printf '  Selection: ' >/dev/tty
+            IFS= read -rsn1 key </dev/tty || break
+            if [[ "$key" == $'\e' ]]; then
+                IFS= read -rsn2 -t 0.05 rest </dev/tty || rest=""
+                key+="$rest"
+            fi
+            case "$key" in
+                $'\r'|$'\n'|"") break ;;
+                1|2|3|4|5)
+                    idx=$((key - 1))
+                    break
+                    ;;
+                $'\e[A'|k|K)
+                    idx=$(( (idx + ${#providers[@]} - 1) % ${#providers[@]} ))
+                    ;;
+                $'\e[B'|j|J)
+                    idx=$(( (idx + 1) % ${#providers[@]} ))
+                    ;;
+            esac
+        done
     fi
-    case "$choice" in
-        2) provider="kimi" ;;
-        3) provider="minimax" ;;
-        4) provider="qwen" ;;
-        5) provider="glm" ;;
-        *) provider="deepseek" ;;
-    esac
-    printf '%s' "$provider"
+    printf '%s' "${providers[$idx]}"
 }
 
 PROVIDER="$(choose_provider)"
