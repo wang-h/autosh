@@ -1,6 +1,8 @@
 """Doctor: diagnostic checks for AutoSH setup."""
 
 import sys
+import termios
+import tty
 from pathlib import Path
 
 import httpx
@@ -8,9 +10,18 @@ import httpx
 from autosh.config import Config
 
 
-def run():
+EXPECTED_KEYS = {
+    "Ctrl+G (fast)": [b"\x07"],
+    "Ctrl+/ or Ctrl+_ (pick)": [b"\x1f"],
+}
+
+
+def run(keys: bool = False):
     print("AutoSH Doctor")
     print("==============")
+    if keys:
+        _run_key_test()
+        print("")
 
     ok = 0
     warn = 0
@@ -94,3 +105,62 @@ def run():
     print(f"\n  Result: {ok} OK, {fail} failed")
     if fail > 0:
         print("  Run `autosh init <shell>` to create config and shell scripts.")
+
+
+def _run_key_test():
+    if not sys.stdin.isatty():
+        print("  ? Key test: skipped (stdin is not a TTY)")
+        return
+
+    print("  Key test")
+    print("  --------")
+    print("  Press the requested shortcut when prompted. Press Esc to skip.")
+    for label, expected in EXPECTED_KEYS.items():
+        data = _read_key(f"  {label}: ")
+        display = _format_bytes(data)
+        matched = data in expected
+        status = "OK" if matched else "not matched"
+        print(f"    received: {display} ({status})")
+        if not matched:
+            expected_display = " or ".join(_format_bytes(item) for item in expected)
+            print(f"    expected: {expected_display}")
+
+
+def _read_key(prompt: str) -> bytes:
+    print(prompt, end="", flush=True)
+    fd = sys.stdin.fileno()
+    old = termios.tcgetattr(fd)
+    try:
+        tty.setraw(fd)
+        data = bytes([sys.stdin.buffer.read(1)[0]])
+        # Alt/meta and enhanced keyboard sequences arrive as ESC-prefixed bytes.
+        if data == b"\x1b":
+            while True:
+                rlist, _, _ = __import__("select").select([sys.stdin], [], [], 0.08)
+                if not rlist:
+                    break
+                chunk = sys.stdin.buffer.read(1)
+                if not chunk:
+                    break
+                data += chunk
+        return data
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old)
+        print("")
+
+
+def _format_bytes(data: bytes) -> str:
+    if not data:
+        return "(none)"
+    parts = []
+    for b in data:
+        if b == 0x1B:
+            parts.append("Esc")
+        elif b < 0x20:
+            parts.append("^" + chr(b + 0x40))
+        elif b == 0x7F:
+            parts.append("^?")
+        else:
+            parts.append(chr(b))
+    hexed = " ".join(f"{b:02x}" for b in data)
+    return f"{''.join(parts)} [{hexed}]"

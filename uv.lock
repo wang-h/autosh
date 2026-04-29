@@ -16,8 +16,8 @@ wheels = [
 ]
 
 [[package]]
-name = "autosh"
-version = "0.1.0"
+name = "autosh-ah"
+version = "0.1.1"
 source = { editable = "." }
 dependencies = [
     { name = "click" },

@@ -1,15 +1,12 @@
 """AutoSH CLI — 一句中文，自动补命令。"""
 
+import os
 import shutil
 import sys
 from importlib import resources
 from pathlib import Path
 
 import click
-
-from autosh.config import PROVIDERS, Config
-from autosh.suggest import suggest, suggest_multi
-from autosh.doctor import run as run_doctor
 
 
 @click.group()
@@ -25,6 +22,8 @@ def init(shell: str):
 
     SHELL must be 'zsh' or 'bash'.
     """
+    from autosh.config import Config
+
     config = Config()
     if not config.get("api_key"):
         click.echo("No API key configured. Set one first:")
@@ -61,8 +60,9 @@ def init(shell: str):
         click.echo(f"  {source_line}")
 
     click.echo(f"\n  Reload your shell or run: source ~/{dest.relative_to(Path.home())}")
-    click.echo(f"\n  Ctrl+/        → 极速出命令")
-    click.echo(f"  Ctrl+Shift+/  → 三选一 + 中文解释")
+    click.echo(f"\n  Ctrl+G       → 极速出命令")
+    click.echo(f"  Ctrl+/       → 三选一 + 中文解释")
+    click.echo(f"  Ctrl+_       → 三选一（Ctrl+/ 的终端等价按键）")
 
 
 @main.group(invoke_without_command=True)
@@ -70,6 +70,8 @@ def init(shell: str):
 def config(ctx):
     """Manage AutoSH configuration."""
     if ctx.invoked_subcommand is None:
+        from autosh.config import Config
+
         c = Config()
         click.echo(c.display())
 
@@ -79,6 +81,8 @@ def config(ctx):
 @click.argument("value")
 def config_set(key: str, value: str):
     """Set a config value."""
+    from autosh.config import PROVIDERS, Config
+
     valid = {"provider", "model", "base_url", "api_key"}
     if key not in valid:
         click.echo(f"Unknown config key: {key}")
@@ -108,6 +112,28 @@ def config_set(key: str, value: str):
 def suggest_cmd(query: tuple[str, ...], multi: bool = False):
     """Generate a shell command suggestion from Chinese text."""
     text = " ".join(query)
+    if not os.environ.get("AUTOSH_NO_DAEMON"):
+        try:
+            from autosh.daemon import DaemonResponseError, suggest as daemon_suggest
+
+            results = daemon_suggest(text, multi)
+            if multi:
+                for r in results:
+                    click.echo(f"{r['cmd']} | {r['desc']}")
+            elif results:
+                click.echo(results[0]["cmd"])
+            else:
+                sys.exit(1)
+            return
+        except DaemonResponseError as e:
+            click.echo(f"Error: {e}", err=True)
+            sys.exit(1)
+        except Exception:
+            pass
+
+    from autosh.config import Config
+    from autosh.suggest import suggest, suggest_multi
+
     config = Config()
     api_key = config.get("api_key")
     if not api_key:
@@ -131,6 +157,46 @@ def suggest_cmd(query: tuple[str, ...], multi: bool = False):
 
 
 @main.command()
-def doctor():
+@click.option("--keys", is_flag=True, help="Interactively test shortcut key sequences.")
+def doctor(keys: bool = False):
     """Check AutoSH setup and diagnose issues."""
-    run_doctor()
+    from autosh.doctor import run as run_doctor
+
+    run_doctor(keys=keys)
+
+
+@main.group("daemon")
+def daemon_group():
+    """Manage the local AutoSH daemon."""
+    pass
+
+
+@daemon_group.command("start")
+def daemon_start():
+    """Start the local daemon."""
+    from autosh.daemon import ensure_running, socket_path
+
+    ensure_running()
+    click.echo(f"daemon running: {socket_path()}")
+
+
+@daemon_group.command("stop")
+def daemon_stop():
+    """Stop the local daemon."""
+    from autosh.daemon import stop
+
+    if stop():
+        click.echo("daemon stopped")
+    else:
+        click.echo("daemon not running")
+
+
+@daemon_group.command("status")
+def daemon_status():
+    """Show daemon status."""
+    from autosh.daemon import is_running, socket_path
+
+    if is_running():
+        click.echo(f"daemon running: {socket_path()}")
+    else:
+        click.echo("daemon not running")

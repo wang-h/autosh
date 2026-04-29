@@ -9,14 +9,14 @@ class AIError(Exception):
     pass
 
 
-def ask(prompt: str, system: str, config) -> str:
+def ask(prompt: str, system: str, config, client: httpx.Client | None = None) -> str:
     fmt = provider_format(config.get("provider"))
     if fmt == "anthropic":
-        return _ask_anthropic(prompt, system, config)
-    return _ask_openai(prompt, system, config)
+        return _ask_anthropic(prompt, system, config, client)
+    return _ask_openai(prompt, system, config, client)
 
 
-def _ask_anthropic(prompt: str, system: str, config) -> str:
+def _ask_anthropic(prompt: str, system: str, config, client: httpx.Client | None = None) -> str:
     url = f"{config.get('base_url').rstrip('/')}/v1/messages"
     headers = {
         "x-api-key": config.get("api_key"),
@@ -33,7 +33,8 @@ def _ask_anthropic(prompt: str, system: str, config) -> str:
         "thinking": {"type": "disabled"},
     }
 
-    resp = httpx.post(url, json=body, headers=headers, timeout=30)
+    transport = client or httpx
+    resp = transport.post(url, json=body, headers=headers, timeout=30)
     resp.raise_for_status()
     data = resp.json()
     for block in data["content"]:
@@ -42,7 +43,7 @@ def _ask_anthropic(prompt: str, system: str, config) -> str:
     return ""
 
 
-def _ask_openai(prompt: str, system: str, config) -> str:
+def _ask_openai(prompt: str, system: str, config, client: httpx.Client | None = None) -> str:
     url = f"{config.get('base_url').rstrip('/')}/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {config.get('api_key')}",
@@ -59,7 +60,8 @@ def _ask_openai(prompt: str, system: str, config) -> str:
         ],
     }
 
-    resp = httpx.post(url, json=body, headers=headers, timeout=30)
+    transport = client or httpx
+    resp = transport.post(url, json=body, headers=headers, timeout=30)
     resp.raise_for_status()
     data = resp.json()
     return data["choices"][0]["message"]["content"].strip()

@@ -79,8 +79,8 @@ echo
 echo "  配 Key 选模型:   ah config set api_key <你的key>"
 echo "                   ah config set provider deepseek"
 echo
-echo "  Ctrl+/       → 极速出命令"
-echo "  Ctrl+Shift+/ → 三选一"
+echo "  Ctrl+G  → 极速出命令"
+echo "  Ctrl+/  → 三选一（部分终端用 Ctrl+_）"
 echo
 echo -e "${CYAN}觉得好用？点个 Star ⭐ 支持一下${NC}"
 echo -n "  (Y/n) "

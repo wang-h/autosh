@@ -2,6 +2,8 @@
 
 import platform
 
+import httpx
+
 from autosh.ai import ask
 from autosh.config import Config
 
@@ -45,7 +47,7 @@ OS_HINTS = {
 }
 
 
-def suggest_multi(query: str, config: Config) -> list[dict]:
+def suggest_multi(query: str, config: Config, client: httpx.Client | None = None) -> list[dict]:
     """Return a list of {cmd, desc} dicts."""
     if not query or not query.strip():
         return []
@@ -56,7 +58,7 @@ def suggest_multi(query: str, config: Config) -> list[dict]:
     if os_hint:
         system += f"\n\n{os_hint}"
 
-    result = ask(query, system, config)
+    result = ask(query, system, config, client)
     items = []
     for line in result.split("\n"):
         line = line.strip()
@@ -71,7 +73,7 @@ def suggest_multi(query: str, config: Config) -> list[dict]:
     return items
 
 
-def suggest(query: str, config: Config) -> str:
+def suggest(query: str, config: Config, client: httpx.Client | None = None) -> str:
     """Return a single shell command suggestion (first option)."""
-    options = suggest_multi(query, config)
+    options = suggest_multi(query, config, client)
     return options[0]["cmd"] if options else ""

@@ -5,7 +5,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ah / AutoSH — 你的终端"啊哈时刻"</title>
-  <meta name="description" content="天下苦 Bash 久已，快来 ah 一下。命令记不住，按 Ctrl+/，剩下的交给 AI，自带解释，看懂放心用。" />
+  <meta name="description" content="天下苦 Bash 久已，快来 ah 一下。命令记不住，按 Ctrl+G，剩下的交给 AI，自带解释，看懂放心用。" />
   <style>
     :root {
       --bg: #020402;
@@ -386,7 +386,7 @@
           <p class="prompt-line">&gt; 天下苦 Bash 久已，快来 ah 一下</p>
           <h1 id="hero-title">一句中文<br />秒出命令</h1>
           <p class="hero-copy">
-            命令记不住，AI来帮助。<br />按 Ctrl+/ （直接出）<br />或者 Ctrl+Shift+/ （三个候选）。<br />自带解释，看懂放心用。
+            命令记不住，AI来帮助。<br />按 Ctrl+G 直接出，或 Ctrl+/ 三选一。<br />自带解释，看懂放心用。
           </p>
           <div class="actions">
             <a class="button" href="#install">装一个试试</a>
@@ -403,11 +403,11 @@
           </div>
           <div class="terminal-body">
             <p class="line">$ docker 清理无用镜像</p>
-            <p class="line muted"># Ctrl+/ (极速) →</p>
+            <p class="line muted"># Ctrl+G (极速) →</p>
             <p class="line cyan">docker system prune -f</p>
             <p class="line">&nbsp;</p>
             <p class="line">$ git 回退到上一个 commit 但保留代码</p>
-            <p class="line muted"># Ctrl+Shift+/ (选择) →</p>
+            <p class="line muted"># Ctrl+/ (选择) →</p>
             <p class="line cyan">[1] git reset --soft HEAD~1 </p>
             <p class="line muted"> # 回退提交，保留修改在暂存区</p>
             <p class="line cyan">[2] git reset --mixed HEAD~1 </p>
@@ -452,11 +452,11 @@
             <strong>2. 按快捷键</strong>
             <div class="kbd-bubbles" role="list">
               <div class="kbd-bubble" role="listitem">
-                <kbd>Ctrl+/</kbd>
+                <kbd>Ctrl+G</kbd>
                 <span class="bubble-label">极速 · 直接出一条命令</span>
               </div>
               <div class="kbd-bubble" role="listitem">
-                <kbd>Ctrl+Shift+/</kbd>
+                <kbd>Ctrl+/</kbd>
                 <span class="bubble-label">选择 · 三个候选各带解释</span>
               </div>
             </div>
