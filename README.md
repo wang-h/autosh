@@ -48,6 +48,13 @@ $ docker system prune -f      # ← 回车就跑
 curl -fsSL https://wang-h.github.io/autosh/install.sh | bash
 ```
 
+**从 PyPI 安装：**
+
+```bash
+uv tool install autosh-ah
+# 或: pip install autosh-ah
+```
+
 **从 GitHub 安装：**
 
 ```bash
