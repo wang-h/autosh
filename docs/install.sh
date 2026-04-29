@@ -75,45 +75,26 @@ prompt_tty() {
 choose_provider() {
     local -a providers=("deepseek" "kimi" "minimax" "qwen" "glm")
     local -a labels=("deepseek (default)" "kimi" "minimax" "qwen" "glm")
+    local choice=""
     local idx=0
-    local key rest
     if [[ -e /dev/tty ]]; then
         printf '%b\n' "${CYAN}→ 先选模型，再配置 Key...${NC}" >/dev/tty
-        while true; do
-            printf '\033[H\033[J' >/dev/tty
-            printf '%b\n' "${CYAN}→ 先选模型，再配置 Key...${NC}" >/dev/tty
-            printf '  Use ↑/↓ to move, Enter to confirm.\n' >/dev/tty
-            printf '\n' >/dev/tty
-            local i
-            for i in "${!labels[@]}"; do
-                if [[ $i -eq $idx ]]; then
-                    printf '  > \033[7m%1d) %s\033[0m\n' "$((i + 1))" "${labels[$i]}" >/dev/tty
-                else
-                    printf '    %1d) %s\n' "$((i + 1))" "${labels[$i]}" >/dev/tty
-                fi
-            done
-            printf '\n' >/dev/tty
-            printf '  Selection: ' >/dev/tty
-            IFS= read -rsn1 key </dev/tty || break
-            if [[ "$key" == $'\e' ]]; then
-                IFS= read -rsn2 -t 0.05 rest </dev/tty || rest=""
-                key+="$rest"
-            fi
-            case "$key" in
-                $'\r'|$'\n'|"") break ;;
-                1|2|3|4|5)
-                    idx=$((key - 1))
-                    break
-                    ;;
-                $'\e[A'|k|K)
-                    idx=$(( (idx + ${#providers[@]} - 1) % ${#providers[@]} ))
-                    ;;
-                $'\e[B'|j|J)
-                    idx=$(( (idx + 1) % ${#providers[@]} ))
-                    ;;
-            esac
+        local i
+        for i in "${!labels[@]}"; do
+            printf '  %1d) %s\n' "$((i + 1))" "${labels[$i]}" >/dev/tty
         done
+        printf '\n' >/dev/tty
+        printf '  请选择 [1-5, Enter=1]: ' >/dev/tty
+        read -r choice </dev/tty || true
+        printf '\n' >/dev/tty
     fi
+    case "$choice" in
+        2) idx=1 ;;
+        3) idx=2 ;;
+        4) idx=3 ;;
+        5) idx=4 ;;
+        *) idx=0 ;;
+    esac
     printf '%s' "${providers[$idx]}"
 }
 
