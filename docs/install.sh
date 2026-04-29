@@ -12,7 +12,7 @@ NC='\033[0m'
 
 printf '%b\n' "${GREEN}╭────────────────────────────╮${NC}"
 printf '%b\n' "${GREEN}│${NC} ${BOLD}AutoSH${NC} ${DIM}/ ah${NC}                ${GREEN}│${NC}"
-printf '%b\n' "${GREEN}│${NC} ${CYAN}一句中文，秒出命令${NC}      ${GREEN}│${NC}"
+printf '%b\n' "${GREEN}│${NC} ${CYAN}一句中文，秒出命令${NC}         ${GREEN}│${NC}"
 printf '%b\n' "${GREEN}╰────────────────────────────╯${NC}"
 printf '\n'
 
