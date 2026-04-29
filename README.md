@@ -1,6 +1,10 @@
 # AutoSH / ah
 
 <p align="center">
+  <img src="https://wang-h.github.io/autosh/logo.svg" alt="AutoSH logo" width="200">
+</p>
+
+<p align="center">
 <pre>
    ▄▄▄      █    █▄▄▄▄ ▄▄▄▄▄
   █   █    █ █   █  ▄▄ █
@@ -143,6 +147,14 @@ bindkey '^?' autosh-pick
 - Python 3.11+
 - zsh 或 bash
 - 任一提供商 API Key（DeepSeek / Kimi / MiniMax / Qwen / GLM）
+
+## Star History
+
+<p align="center">
+  <a href="https://star-history.com/#wang-h/autosh&Date">
+    <img src="https://api.star-history.com/svg?repos=wang-h/autosh&type=Date" alt="Star History Chart" width="600">
+  </a>
+</p>
 
 ## License
 

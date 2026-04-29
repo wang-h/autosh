@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <rect width="200" height="60" fill="#020402" rx="4"/>
+  <rect x="8" y="8" width="44" height="44" fill="#24ff24"/>
+  <text x="30" y="38" font-family="SFMono-Regular, Cascadia Code, Menlo, monospace" font-size="22" font-weight="800" fill="#021002" text-anchor="middle">ah</text>
+  <text x="64" y="38" font-family="SFMono-Regular, Cascadia Code, Menlo, monospace" font-size="22" font-weight="800" fill="#24ff24">AutoSH</text>
+</svg>
