@@ -476,11 +476,11 @@
               `autosh` 装完就能用，短命令叫 `ah`。配好 API Key，煞笔终端立马听懂中文。
             </p>
           </div>
-          <pre><code># 安装 CLI
-pip install autosh
+          <pre><code># 一键安装
+curl -fsSL https://wang-h.github.io/autosh/install.sh | bash
 
-# 或使用 uv
-uv tool install autosh
+# 或手动装
+pip install autosh       # 或者: uv tool install autosh
 
 # 配置 API Key + 切模型
 autosh config set api_key &lt;your-api-key&gt;
