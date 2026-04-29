@@ -473,21 +473,21 @@
           <div>
             <h2 class="section-title" id="install-title">一分钟装好</h2>
             <p class="section-lede">
-              `autosh` 装完就能用，短命令叫 `ah`。配好 API Key，煞笔终端立马听懂中文。
+              `autosh-ah` 装完就能用，短命令叫 `ah`。配好 API Key，终端立马听懂中文。
             </p>
           </div>
           <pre><code># 一键安装
 curl -fsSL https://wang-h.github.io/autosh/install.sh | bash
 
 # 或手动装
-pip install autosh       # 或者: uv tool install autosh
+pip install autosh-ah    # 或者: uv tool install autosh-ah
 
 # 配置 API Key + 切模型
-autosh config set api_key &lt;your-api-key&gt;
-autosh config set provider deepseek   # kimi / minimax / qwen / glm
+ah config set provider deepseek       # kimi / minimax / qwen / glm
+ah config set api_key &lt;your-api-key&gt;
 
 # 安装 Shell 集成
-autosh init zsh
+ah init zsh
 
 # 重新加载配置
 source ~/.zshrc</code></pre>
