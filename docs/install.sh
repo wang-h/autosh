@@ -6,13 +6,15 @@ set -e
 
 GREEN='\033[1;32m'
 CYAN='\033[1;36m'
+DIM='\033[2m'
+BOLD='\033[1m'
 NC='\033[0m'
 
-echo -e "${GREEN}"
-echo "  AutoSH / ah"
-echo "  一句中文，秒出命令"
-echo -e "${NC}"
-echo
+printf '%b\n' "${GREEN}╭────────────────────────────╮${NC}"
+printf '%b\n' "${GREEN}│${NC} ${BOLD}AutoSH${NC} ${DIM}/ ah${NC}                 ${GREEN}│${NC}"
+printf '%b\n' "${GREEN}│${NC} ${CYAN}一句中文，秒出命令${NC}       ${GREEN}│${NC}"
+printf '%b\n' "${GREEN}╰────────────────────────────╯${NC}"
+printf '\n'
 
 # Check Python
 if command -v python3 &>/dev/null; then
