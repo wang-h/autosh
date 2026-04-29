@@ -9,13 +9,9 @@ CYAN='\033[1;36m'
 NC='\033[0m'
 
 echo -e "${GREEN}"
-echo "   ▄▄▄      █    █▄▄▄▄ ▄▄▄▄▄"
-echo "  █   █    █ █   █  ▄▄ █     "
-echo "  █▀▀▀█   █   █  █▄▄█  █▄▄▄▄ "
-echo "  █   █  █     █ █         █"
-echo "  █   █  █▄▄▄▄▄█ █▄▄▄▄ █▄▄▄█"
+echo "  AutoSH / ah"
+echo "  一句中文，秒出命令"
 echo -e "${NC}"
-echo "  AutoSH — 一句中文，秒出命令"
 echo
 
 # Check Python
