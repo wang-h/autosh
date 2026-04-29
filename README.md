@@ -1,6 +1,16 @@
 # AutoSH / ah
 
 <p align="center">
+<pre>
+   ▄▄▄      █    █▄▄▄▄ ▄▄▄▄▄
+  █   █    █ █   █  ▄▄ █
+  █▀▀▀█   █   █  █▄▄█  █▄▄▄▄
+  █   █  █     █ █         █
+  █   █  █▄▄▄▄▄█ █▄▄▄▄ █▄▄▄█
+</pre>
+</p>
+
+<p align="center">
   <a href="https://github.com/wang-h/autosh/stargazers"><img src="https://img.shields.io/github/stars/wang-h/autosh?style=flat-square&color=24ff24" alt="stars"></a>
   <img src="https://img.shields.io/badge/python-3.11+-24ff24?style=flat-square" alt="python">
   <img src="https://img.shields.io/badge/zsh-✓-24ff24?style=flat-square" alt="zsh">
@@ -9,9 +19,9 @@
   <img src="https://img.shields.io/github/last-commit/wang-h/autosh?style=flat-square&color=24ff24" alt="updated">
 </p>
 
-卧槽，命令忘了怎么办！
-
-别急：一句中文，秒出命令。
+> 卧槽，命令忘了怎么办！
+>
+> 别急：**一句中文，秒出命令**。
 
 AutoSH（`ah`）是给中文程序员的终端 AI 助手。在 zsh 里写中文，按一下就出命令。
 
@@ -44,20 +54,20 @@ $ docker system prune -f      # ← 回车就跑
 curl -fsSL https://wang-h.github.io/autosh/install.sh | bash
 ```
 
-**手动安装：**
+**从 GitHub 安装：**
 
 ```bash
-# 1. 装 CLI
-pip install autosh          # 或: uv tool install autosh
+uv tool install git+https://github.com/wang-h/autosh.git
+# 或: pip install git+https://github.com/wang-h/autosh.git
+```
 
-# 2. 配 Key + 选模型
+然后配 Key + 切模型 + 注入 Shell：
+
+```bash
 ah config set api_key <your-api-key>
 ah config set provider deepseek   # 支持: kimi / minimax / qwen / glm
-
-# 3. 注入 Shell
-ah init zsh                 # zsh 用户
-ah init bash                # bash 用户
-source ~/.zshrc             # 或: source ~/.bashrc
+ah init zsh                       # 或 ah init bash
+source ~/.zshrc
 ```
 
 装完就可以在终端里用了——**zsh 和 bash 都支持**，`ah init` 会自动识别。
