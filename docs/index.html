@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ah / AutoSH — 你的终端"啊哈时刻"</title>
+  <meta name="description" content="天下苦 Bash 久已，快来 ah 一下。命令记不住，按 Ctrl+/，剩下的交给 AI，自带解释，看懂放心用。" />
+  <style>
+    :root {
+      --bg: #020402;
+      --panel: #111611;
+      --panel-strong: #1c211c;
+      --line: #16c916;
+      --green: #24ff24;
+      --green-dim: #0fa70f;
+      --cyan: #00d8e8;
+      --red: #ce2d18;
+      --text: #d9fdd9;
+      --muted: #82a982;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background:
+        linear-gradient(rgba(36, 255, 36, 0.045) 1px, transparent 1px),
+        radial-gradient(circle at 50% 0%, rgba(36, 255, 36, 0.13), transparent 34rem),
+        var(--bg);
+      background-size: 100% 4px, auto, auto;
+      color: var(--green);
+      font-family: "SFMono-Regular", "Cascadia Code", "JetBrains Mono", Menlo, Consolas, monospace;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .shell-page {
+      min-height: 100vh;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      border-bottom: 1px solid rgba(36, 255, 36, 0.55);
+      background: rgba(2, 4, 2, 0.88);
+      padding: 1rem clamp(1rem, 4vw, 3rem);
+      backdrop-filter: blur(12px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: clamp(1.25rem, 2vw, 2rem);
+      font-weight: 800;
+    }
+
+    .brand-mark {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.3rem;
+      height: 2.3rem;
+      border: 1px solid var(--green);
+      background: var(--green);
+      color: #021002;
+      font-size: 1.05rem;
+      line-height: 1;
+      padding-bottom: 0.04em;
+    }
+
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 1rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.03fr) minmax(20rem, 0.97fr);
+      gap: clamp(2rem, 5vw, 5rem);
+      align-items: center;
+      min-height: calc(100vh - 4.8rem);
+      padding: clamp(3rem, 7vw, 6rem) clamp(1rem, 4vw, 3rem);
+    }
+
+    .prompt-line {
+      margin: 0 0 1rem;
+      color: var(--cyan);
+      font-size: clamp(1rem, 1.8vw, 1.25rem);
+    }
+
+    h1 {
+      max-width: 12ch;
+      margin: 0;
+      color: var(--green);
+      font-size: clamp(3rem, 8.5vw, 7.8rem);
+      line-height: 0.94;
+      letter-spacing: 0;
+    }
+
+    .hero-copy {
+      max-width: 46rem;
+      margin: 1.5rem 0 0;
+      color: var(--text);
+      font-size: clamp(1.05rem, 2vw, 1.45rem);
+      line-height: 1.75;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+      margin-top: 2rem;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 3rem;
+      border: 1px solid var(--green);
+      padding: 0.7rem 1rem;
+      background: var(--green);
+      color: #021002;
+      font-weight: 800;
+    }
+
+    .button.secondary {
+      background: transparent;
+      color: var(--green);
+    }
+
+    .terminal {
+      border: 1px solid rgba(36, 255, 36, 0.62);
+      background: rgba(4, 10, 4, 0.92);
+      box-shadow: 0 0 48px rgba(36, 255, 36, 0.1);
+    }
+
+    .terminal-head {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      border-bottom: 1px solid rgba(36, 255, 36, 0.45);
+      padding: 0.85rem 1rem;
+      background: var(--panel);
+      color: var(--muted);
+    }
+
+    .dot {
+      width: 0.72rem;
+      height: 0.72rem;
+      border-radius: 50%;
+      background: var(--green-dim);
+    }
+
+    .dot.red {
+      background: var(--red);
+    }
+
+    .terminal-body {
+      padding: clamp(1rem, 3vw, 1.6rem);
+      font-size: clamp(0.95rem, 1.8vw, 1.25rem);
+      line-height: 1.7;
+    }
+
+    .line {
+      margin: 0.25rem 0;
+      white-space: pre-wrap;
+    }
+
+    .cyan {
+      color: var(--cyan);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .input-bar {
+      margin-top: 1.4rem;
+      background: var(--panel-strong);
+      padding: 0.9rem 1rem;
+      color: var(--green);
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 0.65em;
+      height: 1.1em;
+      transform: translateY(0.15em);
+      background: var(--green);
+      animation: blink 1s steps(2, start) infinite;
+    }
+
+    section {
+      border-top: 1px solid rgba(36, 255, 36, 0.55);
+      padding: clamp(3rem, 7vw, 5rem) clamp(1rem, 4vw, 3rem);
+    }
+
+    .section-title {
+      margin: 0 0 1rem;
+      color: var(--cyan);
+      font-size: clamp(1.7rem, 4vw, 3.2rem);
+      line-height: 1.1;
+    }
+
+    .section-lede {
+      max-width: 58rem;
+      margin: 0 0 2rem;
+      color: var(--text);
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      line-height: 1.85;
+    }
+
+    .pain-grid,
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1px;
+      border: 1px solid rgba(36, 255, 36, 0.45);
+      background: rgba(36, 255, 36, 0.45);
+    }
+
+    .cell {
+      min-height: 12rem;
+      background: var(--bg);
+      padding: 1.25rem;
+    }
+
+    .cell strong {
+      display: block;
+      margin-bottom: 1rem;
+      color: var(--green);
+      font-size: 1.2rem;
+    }
+
+    .cell p {
+      margin: 0;
+      color: var(--text);
+      line-height: 1.75;
+    }
+
+    .kbd-bubbles {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border: 1px solid rgba(36, 255, 36, 0.45);
+      background: rgba(4, 10, 4, 0.72);
+    }
+
+    .kbd-bubble {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: baseline;
+      column-gap: 1rem;
+      row-gap: 0.35rem;
+      margin: 0;
+      border: none;
+      border-bottom: 1px solid rgba(36, 255, 36, 0.28);
+      border-radius: 0;
+      padding: 0.75rem 1rem;
+      background: transparent;
+      color: var(--text);
+      font-size: clamp(0.92rem, 1.65vw, 1.08rem);
+      line-height: 1.65;
+    }
+
+    .kbd-bubble:last-child {
+      border-bottom: none;
+    }
+
+    .kbd-bubble kbd {
+      flex-shrink: 0;
+      padding: 0;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      color: var(--cyan);
+      font-family: inherit;
+      font-size: 1em;
+    }
+
+    .kbd-bubble .bubble-label {
+      color: var(--muted);
+      font-size: 0.96em;
+      line-height: 1.65;
+    }
+
+    .install {
+      display: grid;
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      gap: clamp(1.5rem, 4vw, 3rem);
+      align-items: start;
+    }
+
+    pre {
+      margin: 0;
+      overflow-x: auto;
+      border: 1px solid rgba(36, 255, 36, 0.62);
+      background: rgba(0, 0, 0, 0.65);
+      padding: 1.2rem;
+      color: var(--text);
+      font-size: clamp(0.9rem, 1.6vw, 1.08rem);
+      line-height: 1.75;
+    }
+
+    code {
+      font-family: inherit;
+    }
+
+    footer {
+      padding: 2rem clamp(1rem, 4vw, 3rem);
+      border-top: 1px solid rgba(36, 255, 36, 0.55);
+      color: var(--muted);
+    }
+
+    @keyframes blink {
+      50% {
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .nav {
+        justify-content: flex-start;
+      }
+
+      .hero,
+      .install {
+        grid-template-columns: 1fr;
+      }
+
+      .pain-grid,
+      .steps {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        max-width: 10ch;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell-page">
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="AutoSH 首页">
+        <span class="brand-mark">ah</span>
+        <span>AutoSH</span>
+      </a>
+      <nav class="nav" aria-label="主导航">
+        <a href="#pain">为什么需要</a>
+        <a href="#usage">怎么工作</a>
+        <a href="#install">安装</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div>
+          <p class="prompt-line">&gt; 天下苦 Bash 久已，快来 ah 一下</p>
+          <h1 id="hero-title">一句中文<br />秒出命令</h1>
+          <p class="hero-copy">
+            命令记不住，AI来帮助。<br />按 Ctrl+/ （直接出）<br />或者 Ctrl+Shift+/ （三个候选）。<br />自带解释，看懂放心用。
+          </p>
+          <div class="actions">
+            <a class="button" href="#install">装一个试试</a>
+            <a class="button secondary" href="#usage">先看效果</a>
+          </div>
+        </div>
+
+        <div class="terminal" aria-label="AutoSH 终端演示">
+          <div class="terminal-head">
+            <span class="dot red"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span>ah@moment ~ %</span>
+          </div>
+          <div class="terminal-body">
+            <p class="line">$ docker 清理无用镜像</p>
+            <p class="line muted"># Ctrl+/ (极速) →</p>
+            <p class="line cyan">docker system prune -f</p>
+            <p class="line">&nbsp;</p>
+            <p class="line">$ git 回退到上一个 commit 但保留代码</p>
+            <p class="line muted"># Ctrl+Shift+/ (选择) →</p>
+            <p class="line cyan">[1] git reset --soft HEAD~1 </p>
+            <p class="line muted"> # 回退提交，保留修改在暂存区</p>
+            <p class="line cyan">[2] git reset --mixed HEAD~1 </p>
+            <p class="line muted"> # 回退提交，保留修改但不暂存</p>
+            <p class="line cyan">[3] git revert --no-edit HEAD </p>
+            <p class="line muted"> # 新建提交来撤销，不修改历史</p>
+            <p class="line">&nbsp;</p>
+            <div class="input-bar">&gt; 查看端口 3000 被谁占了 <span class="cursor"></span></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="pain" aria-labelledby="pain-title">
+        <h2 class="section-title" id="pain-title">那些"我操！这命令怎么写？"的时刻</h2>
+        <p class="section-lede">
+          受够了！！ 要打包、清磁盘、修 git、查日志……这些破事总在最忙的时候找上门。打开终端，命令忘了！打开浏览器，搜半天还不敢直接跑。问了大模型，墨迹半天没输出。
+        </p>
+        <div class="pain-grid">
+          <article class="cell">
+            <strong>不搜了</strong>
+            <p>`find` 参数记不住？`docker` 组合太绕？中文怎么说就怎么写，ah 帮你翻译成命令。英语不够，技术来凑。</p>
+          </article>
+          <article class="cell">
+            <strong>不抄了</strong>
+            <p>Stack Overflow 上的命令你敢直接跑吗？CSDN上古命令你敢直接抄吗？让每条建议都带解释，看懂了再回车。</p>
+          </article>
+          <article class="cell">
+            <strong>不切了</strong>
+            <p>不用切窗口、不用切语言、不用把思路从代码里拔出来，不开聊天窗口。按一下，继续干活，省心省力省时间。</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="usage" aria-labelledby="usage-title">
+        <h2 class="section-title" id="usage-title">三步，比搜快十倍</h2>
+        <div class="steps">
+          <article class="cell">
+            <strong>1. 写中文</strong>
+            <p>想干嘛写啥：`docker 清理无用镜像和停止容器`。不用学，本来就是母语。</p>
+          </article>
+          <article class="cell">
+            <strong>2. 按快捷键</strong>
+            <div class="kbd-bubbles" role="list">
+              <div class="kbd-bubble" role="listitem">
+                <kbd>Ctrl+/</kbd>
+                <span class="bubble-label">极速 · 直接出一条命令</span>
+              </div>
+              <div class="kbd-bubble" role="listitem">
+                <kbd>Ctrl+Shift+/</kbd>
+                <span class="bubble-label">选择 · 三个候选各带解释</span>
+              </div>
+            </div>
+          </article>
+          <article class="cell">
+            <strong>3. 看懂了回车</strong>
+            <p>命令不是黑盒子。先看清楚它干啥，再决定跑不跑。不爽还能换一个。</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="install" aria-labelledby="install-title">
+        <div class="install">
+          <div>
+            <h2 class="section-title" id="install-title">一分钟装好</h2>
+            <p class="section-lede">
+              `autosh` 装完就能用，短命令叫 `ah`。配好 API Key，煞笔终端立马听懂中文。
+            </p>
+          </div>
+          <pre><code># 安装 CLI
+pip install autosh
+
+# 或使用 uv
+uv tool install autosh
+
+# 配置 API Key + 切模型
+autosh config set api_key &lt;your-api-key&gt;
+autosh config set provider deepseek   # kimi / minimax / qwen / glm
+
+# 安装 Shell 集成
+autosh init zsh
+
+# 重新加载配置
+source ~/.zshrc</code></pre>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>AutoSH / ah</span>
+      <span> · </span>
+      <span>一句中文，秒出命令 — 把搜索栏踢出你的工作流。</span>
+    </footer>
+  </div>
+</body>
+
+</html>
