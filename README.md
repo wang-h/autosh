@@ -5,16 +5,6 @@
 </p>
 
 <p align="center">
-<pre>
-   ▄▄▄      █    █▄▄▄▄ ▄▄▄▄▄
-  █   █    █ █   █  ▄▄ █
-  █▀▀▀█   █   █  █▄▄█  █▄▄▄▄
-  █   █  █     █ █         █
-  █   █  █▄▄▄▄▄█ █▄▄▄▄ █▄▄▄█
-</pre>
-</p>
-
-<p align="center">
   <a href="https://github.com/wang-h/autosh/stargazers"><img src="https://img.shields.io/github/stars/wang-h/autosh?style=flat-square&color=24ff24" alt="stars"></a>
   <img src="https://img.shields.io/badge/python-3.11+-24ff24?style=flat-square" alt="python">
   <img src="https://img.shields.io/badge/zsh-✓-24ff24?style=flat-square" alt="zsh">
